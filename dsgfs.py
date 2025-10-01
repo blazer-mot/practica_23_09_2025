@@ -27,7 +27,7 @@ def get_new_driver(request_counter):
     opts.add_argument("--no-sandbox")
     opts.add_argument("--window-size=1920,1080")
     opts.add_argument("--log-level=3")
-    opts.add_argument("--remote-debugging-port=0")  # 👈 скрывает DevTools listening
+    opts.add_argument("--remote-debugging-port=0")  
     opts.add_experimental_option("excludeSwitches", ["enable-logging"])
     opts.add_argument(f"user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{random_version}.0.0.0 Safari/537.36")
 
@@ -107,15 +107,13 @@ if __name__ == "__main__":
     with Pool(processes=10) as pool:
         pool.map(process_single, [(link, i) for i, link in enumerate(final_links)])
 
-    # Объединение всех CSV
     all_parts = [f for f in os.listdir() if f.startswith("parsed_single_") and f.endswith(".csv")]
     dfs = [pd.read_csv(f) for f in sorted(all_parts)]
     final_df = pd.concat(dfs, ignore_index=True)
     final_df = final_df.replace(r'^\s*$', None, regex=True)
     final_df = final_df.where(pd.notnull(final_df), "None")
     final_df.to_csv("parsed_data.csv", index=False, encoding="utf-8-sig")
-
-    # Удаление временных файлов
+    
     for f in all_parts:
         try:
             os.remove(f)
